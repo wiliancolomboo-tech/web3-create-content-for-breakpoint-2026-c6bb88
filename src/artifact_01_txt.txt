@@ -1,0 +1,14 @@
+HyperDrive Core Engine
+                           
+   +----------------+     +-------------------+     +--------------------+
+   |  User Intent   | --> | Zero-Copy Epoch   | --> | Keeper-Triggered   |
+   | (Off-chain sig |     | Batch Buffer PDA  |     | Uniform Clearing   |
+   |  + On-chain)   |     | (Ring Buffer)     |     | CPI Settlement     |
+   +----------------+     +-------------------+     +--------------------+
+                                                      |
+                                                      v
+                                            +--------------------+
+                                            | Token-2022 Hook    |
+                                            | (Dynamic MEV Tax   |
+                                            |  & Rebate Split)   |
+                                            +--------------------+

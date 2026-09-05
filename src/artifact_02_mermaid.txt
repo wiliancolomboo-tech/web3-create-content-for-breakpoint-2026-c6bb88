@@ -1,0 +1,50 @@
+flowchart TD
+    subgraph Client_Layer ["Client & Swapper Layer"]
+        U1["User Alice (Maker)"]
+        U2["User Bob (Maker)"]
+        Keeper["Settlement Keeper / Crank Bot"]
+    end
+
+    subgraph Program_Derived_Addresses ["Deterministic PDA Account States"]
+        ConfigPDA["EngineConfig PDA<br/>seeds=['config']<br/>- authority: Pubkey<br/>- fee_bps: u16<br/>- paused: bool"]
+        BatchBufferPDA["BatchBuffer PDA (Zero-Copy)<br/>seeds=['batch', epoch_id]<br/>- epoch_id: u64<br/>- intent_count: u32<br/>- intents: [OrderIntent; 64]<br/>- total_in: u64<br/>- settled: bool"]
+        VaultPDA["IntentVault PDA<br/>seeds=['vault', mint_in]<br/>- SPL/Token-2022 Token Account<br/>- Holds input tokens in escrow"]
+    end
+
+    subgraph Core_Program ["HyperDrive Anchor Program (`lib.rs`)"]
+        IxSubmit["Instruction: submit_intent()<br/>1. Verifies Epoch State<br/>2. Writes to Ring Buffer<br/>3. CPI Transfer to Vault"]
+        IxSettle["Instruction: batch_settle()<br/>1. Enforces batch settlement window<br/>2. Validates uniform price<br/>3. Executes AMM swap CPI<br/>4. Disburses outputs to users<br/>5. Rewards Keeper rebate"]
+        IxCancel["Instruction: cancel_intent()<br/>1. Validates signer == user<br/>2. Marks slot invalid<br/>3. Refunds escrow tokens"]
+    end
+
+    subgraph Token_2022_Hook ["Token-2022 Transfer Hook Extension Program"]
+        HookProgram["Transfer Hook Program<br/>seeds=['hook_state']<br/>- Calculates dynamic MEV tax<br/>- Routes 30% to Staking Pool<br/>- Routes 70% to Keeper Rebate"]
+    end
+
+    subgraph External_Ecosystem ["External Solana Programs"]
+        SPLToken["Token-2022 / SPL Token Program"]
+        DEXPool["Raydium / Whirlpool / Orca AMM"]
+        SystemProgram["Solana System Program"]
+    end
+
+    %% Flow associations
+    U1 -->|1. Sign & Submit Intent| IxSubmit
+    U2 -->|1. Sign & Submit Intent| IxSubmit
+    IxSubmit -->|Write Zero-Copy| BatchBufferPDA
+    IxSubmit -->|Escrow Transfer CPI| SPLToken
+    SPLToken -->|Deposit| VaultPDA
+    ConfigPDA -.->|Validate Fee & Status| IxSubmit
+
+    Keeper -->|2. Observe Epoch Close & Trigger| IxSettle
+    IxSettle -->|Read Batch & Mutate State| BatchBufferPDA
+    IxSettle -->|Draw Escrowed Liquidity| VaultPDA
+    IxSettle -->|Execute Swap CPI| DEXPool
+    DEXPool -->|Return Out Tokens| IxSettle
+    IxSettle -->|Disperse Swapped Proceeds| SPLToken
+    SPLToken -->|Transfer Hook CPI| HookProgram
+    SPLToken -->|Credit tokens| U1
+    SPLToken -->|Credit tokens| U2
+    IxSettle -->|Credit Execution Rebate| Keeper
+    
+    U1 -.->|Emergency Revoke| IxCancel
+    IxCancel -->|Release Escrow| VaultPDA

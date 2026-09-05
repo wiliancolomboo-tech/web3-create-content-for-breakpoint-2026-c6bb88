@@ -1,0 +1,11 @@
+node_modules/
+target/
+.anchor/
+dist/
+out/
+cache/
+.env
+*.log
+__pycache__/
+*.pyc
+.DS_Store

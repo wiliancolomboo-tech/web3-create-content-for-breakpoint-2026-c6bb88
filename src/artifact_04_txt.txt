@@ -1,0 +1,4 @@
+[0:00 - 0:25] THE WALL: Token-2022 CU Bottleneck & Toxic Sandwiching
+[0:25 - 0:55] ARCHITECTURE: Zero-Copy Deserialization & Native EWMA Engine
+[0:55 - 1:35] LIVE TERMINAL: anchor test, CU Breakdown & Surge Protection
+[1:35 - 2:00] THE VERDICT: Why HyperHook Wins Breakpoint 2026

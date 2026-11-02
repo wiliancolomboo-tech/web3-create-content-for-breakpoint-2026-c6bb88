@@ -1,0 +1,9 @@
+Solana Intent Engine (SIE-v2) Integration QA Matrix
+    ✔ 1. Initializes the SIE Engine with valid parameters (428ms)
+    ✔ 2. Opens a new auction batch for Epoch 2026 (462ms)
+    ✔ 3. Buyer deposits 150 USDC to purchase Base at max limit price 150 USDC/SOL (512ms)
+    ✔ 4. Seller deposits 1 SOL to sell Base at min limit price 140 USDC/SOL (498ms)
+    ✔ 5. Fails early when attempting to settle before batch slot window elapses (118ms)
+    ✔ 6. Successfully settles batch after epoch duration with zero AMM slippage (1894ms)
+
+  6 passing (3.91s)

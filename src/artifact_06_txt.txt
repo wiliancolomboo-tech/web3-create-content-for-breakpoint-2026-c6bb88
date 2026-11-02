@@ -1,0 +1,25 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│                             STREAMPOINT DEFENSE-IN-DEPTH                                 │
+├─────────────────────────┬───────────────────────────┬────────────────────────────────────┤
+│ Attack Vector           │ Traditional Vulnerability │ StreamPoint-2026 Hardening         │
+├─────────────────────────┼───────────────────────────┼────────────────────────────────────┤
+│ 1. PDA Spoofing         │ Unchecked account keys    │ Strict canonical PDA derivation    │
+│                         │ injected by attacker      │ with `seeds = [...]` + `bump`      │
+│                         │                           │ validation in all Anchor contexts. │
+├─────────────────────────┼───────────────────────────┼────────────────────────────────────┤
+│ 2. Reentrancy via CPI   │ Recursive callback during │ State updates before CPI payouts;  │
+│                         │ Token-2022 transfer hook  │ transient bitmask lock pattern on  │
+│                         │                           │ channel state registers.           │
+├─────────────────────────┼───────────────────────────┼────────────────────────────────────┤
+│ 3. Integer Overflow     │ Balance draining during   │ Mandatory Rust `checked_add/sub/   │
+│    in Micro-Pacing      │ elapsed timestamp math    │ mul` enforcing safe math limits    │
+│                         │                           │ via StreamPointError::MathOverflow │
+├─────────────────────────┼───────────────────────────┼────────────────────────────────────┤
+│ 4. Sysvar Mocking       │ Malicious instructions    │ Introspecting Solana Instruction   │
+│                         │ sysvar spoofed by sender  │ Sysvar at index 0 via canonical    │
+│                         │                           │ `ix_sysvar::check_id()` validation │
+├─────────────────────────┼───────────────────────────┼────────────────────────────────────┤
+│ 5. Front-Running Settle │ MEV Searcher steals       │ Deterministic rate math: Payout is │
+│                         │ creator streaming rewards │ strict function of elapsed time;   │
+│                         │                           │ creator wallet is hardcoded in PDA │
+└─────────────────────────┴───────────────────────────┴────────────────────────────────────┘

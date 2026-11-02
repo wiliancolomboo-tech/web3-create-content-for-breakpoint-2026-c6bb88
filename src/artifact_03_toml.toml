@@ -1,0 +1,24 @@
+[package]
+name = "breakpoint_pass"
+version = "0.1.0"
+description = "Breakpoint 2026 Production Ticket Stream & Token-2022 Transfer Hook Engine"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "breakpoint_pass"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.30.1", features = ["init-if-needed"] }
+anchor-spl = { version = "0.30.1", features = ["token_2022", "token_2022_extensions"] }
+spl-token-2022 = { version = "0.13.0", features = ["no-entrypoint"] }
+spl-transfer-hook-interface = "0.6.3"
+spl-tlv-account-resolution = "0.6.3"
+bytemuck = { version = "1.18.0", features = ["derive"] }

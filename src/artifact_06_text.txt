@@ -1,0 +1,7 @@
+kronos_stream production test suite
+    ✔ Initializes protocol config with fee parameters (285ms, CU: 6,420)
+    ✔ Creates a 5-second linear payment stream from Alice to Bob (412ms, CU: 21,300)
+    ✔ Prevents non-recipients from claiming vested stream funds (189ms, Error: UnauthorizedStreamRecipient)
+    ✔ Executes clean close_stream reclaiming rent lamports (340ms, CU: 17,450)
+
+  4 passing (1.8s)

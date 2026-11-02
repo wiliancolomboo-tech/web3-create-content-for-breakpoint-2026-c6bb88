@@ -1,0 +1,2 @@
+Compiling hyperstate v0.1.0 (...)
+Finished release [optimized] target(s) in 8.42s

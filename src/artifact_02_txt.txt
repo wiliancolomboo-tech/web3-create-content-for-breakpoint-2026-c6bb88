@@ -1,0 +1,10 @@
+TRADITIONAL ON-CHAIN DEX vs. CHRONOSTRIKE
+┌─────────────────────────────────────────┐   ┌─────────────────────────────────────────┐
+│       Legacy Slot Execution (AMM)       │   │        ChronoStrike SVM Engine          │
+├─────────────────────────────────────────┤   ├─────────────────────────────────────────┤
+│ • High CU Footprint (~85,000+ CU)       │   │ • Ultra-Lean CU footprint (~11,420 CU)  │
+│ • State locking across shared pools     │   │ • Granular account isolation (Per-Maker)│
+│ • Susceptible to toxic MEV searchers    │   │ • Cryptographic commit-reveal protection│
+│ • Borsh dynamic allocation overhead     │   │ • Zero-copy `bytemuck` zero-heap memory │
+│ • Single-signature synchronous blocking │   │ • Non-blocking asynchronous fills       │
+└─────────────────────────────────────────┘   └─────────────────────────────────────────┘

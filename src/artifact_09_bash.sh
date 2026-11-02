@@ -1,2 +1,1 @@
-# Execute integration test matrix
-anchor test
+solana-test-validator --reset

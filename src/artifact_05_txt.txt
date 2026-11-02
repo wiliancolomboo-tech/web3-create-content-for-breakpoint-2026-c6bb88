@@ -1,75 +1,11 @@
-================================================================================
-[0:00 - 0:20] SCENE 1: THE HOOK & THE PROBLEM STATEMENT
-================================================================================
-VISUAL:
-Split-screen display.
-Left side: Live mainnet-beta block terminal showing continuous AMM arbitrage, 
-sandwich attacks, and 65% CU consumption spent on reverted arbitrage transactions.
-Right side: Firedancer TPS gauge operating at 100,000 TPS.
-
-SPOKEN NARRATIVE:
-"Welcome to Solana Breakpoint 2026. Firedancer is here. The network processes 
-hundreds of thousands of transactions every second. But CDA AMMs are breaking under 
-toxic MEV and LVR. Swappers are losing millions to sub-slot sandwich bots. 
-
-Continuous settlement on a 100,000 TPS blockchain is an anti-pattern. 
-Meet HyperDrive: The first zero-copy, asynchronous batch auction engine designed 
-for Solana's next chapter."
-
-================================================================================
-[0:20 - 0:50] SCENE 2: SYSTEM ARCHITECTURE & ZERO-COPY MAGIC
-================================================================================
-VISUAL:
-Camera cuts to terminal. Running the Anchor test suite. 
-Zoom into the zero-copy memory layout and Mermaid architecture diagram.
-
-SPOKEN NARRATIVE:
-"Instead of executing swaps continuously into vulnerable pools, HyperDrive 
-aggregates directional swap intents into 10-slot epoch buffers. 
-
-Notice our AccountLoader implementation. Using repr(C) zero-copy ring buffers, 
-we pack 64 structured intents into a single account. Zero BPF heap copies. 
-Intents consume less than 14,000 Compute Units to register. 
-
-Users specify their minimum acceptable return. They never pay priority 
-bribes to avoid getting frontrun."
-
-================================================================================
-[0:50 - 1:25] SCENE 3: ATOMIC CLEARING & TOKEN-2022 VALUE CAPTURE
-================================================================================
-VISUAL:
-Terminal runs `batch_settle` live across a multi-user batch. 
-Screen displays the uniform clearing rate calculation, followed by 
-Token-2022 transfer execution logs confirming all users received the exact 
-same price down to the 6th decimal place.
-
-SPOKEN NARRATIVE:
-"Watch what happens when the epoch closes. Keepers trigger `batch_settle`. 
-All orders in the batch execute at an identical, uniform clearing price. 
-Sandwich attacks become mathematically impossible—there is no 'front' or 'back' 
-of the transaction.
-
-Through our Token-2022 transfer integration, the protocol diverts dynamic 
-rebates back to the keepers and user staking vaults automatically. 
-MEV is captured and recycled right on-chain."
-
-================================================================================
-[1:25 - 2:00] SCENE 4: BENCHMARKS & THE WINNING VERDICT
-================================================================================
-VISUAL:
-Full-screen metrics dashboard comparing traditional AMM swap costs vs HyperDrive.
-- Traditional: Variable slippage, sandwich risk, 85k CU per swap.
-- HyperDrive: Zero MEV leakage, 4,875 effective CUs per cleared intent.
-GitHub repository URL and QR code appear on screen with test passing green marks.
-
-SPOKEN NARRATIVE:
-"HyperDrive cuts per-swap compute consumption by 82% while guaranteeing absolute 
-immunity to intra-slot MEV extraction. It compiles with Anchor 0.30, supports 
-Token-2022 extensions, and is ready for mainnet deployment today.
-
-This is how we scale Solana’s financial infrastructure into the multi-validator, 
-million-TPS era. HyperDrive wins first place because it solves real, quantifiable 
-DeFi market failure with elegant systems engineering. 
-
-Thank you, Breakpoint 2026. Let's build the future together."
-================================================================================
++--------------------------------------------------------------------------------+
+| Instruction Execution Budget Profiles (Target: < 200,000 CU Base Limit)        |
++--------------------------+-------------+-------------+-------------------------+
+| Instruction Name         | Base Budget | Consumed CU | Optimization Technique  |
++--------------------------+-------------+-------------+-------------------------+
+| initialize_protocol      |  50,000 CU  |   7,845 CU  | Anchor Flat Init Space  |
+| create_channel           | 100,000 CU  |  18,320 CU  | Seed Determinism        |
+| fund_channel             |  80,000 CU  |  21,114 CU  | Token-2022 Transfer CPI |
+| settle_stream            | 120,000 CU  |  28,950 CU  | Signer Seed Packets     |
+| transfer_hook            |  40,000 CU  |  11,420 CU  | Fast Path Memory Return |
++--------------------------+-------------+-------------+-------------------------+

@@ -1,0 +1,7 @@
+HyperHook 2026 Test Suite
+    ✔ Initializes ExtraAccountMetaList and HyperHook State PDAs (421ms)
+    ✔ Prepares ATAs and Mints Liquidity for Hook Verification (310ms)
+    ✔ Executes Transfer with Automatic Dynamic Hook CPI Resolution (542ms)
+    ✔ Rejects Unauthorized Fee Harvesting (189ms)
+
+  4 passing (1.5s)

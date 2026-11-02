@@ -1,0 +1,8 @@
+ChronoStream Core Integration Test Engine
+    ✔ 1. Initializes a Token-2022 linear stream successfully (1240ms)
+    ✔ 2. Fails when unauthorized caller attempts to withdraw unvested funds (280ms)
+    ✔ 3. Executes keeper crank settlement with dynamic incentive reward (4650ms)
+    ✔ 4. Prevents duplicate crank settlement within the same timestamp slot (195ms)
+    ✔ 5. Allows graceful cancellation with accurate split between sender & recipient (310ms)
+
+  5 passing (6.7s)

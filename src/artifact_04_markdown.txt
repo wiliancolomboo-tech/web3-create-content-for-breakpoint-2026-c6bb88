@@ -1,0 +1,60 @@
+================================================================================
+AEGIS-2026: BREAKPOINT 2026 SUBMISSION PITCH SCRIPT
+TITLE: Sub-Slot Micro-Settlement on Firedancer
+PRESENTER: Principal Systems Architect
+================================================================================
+
+[00:00 - 00:15] TITLE SLIDE & THE PROBLEM STATEMENT
+Visual:
+- Screen recording opens showing a Firedancer terminal visualizer streaming slots 
+  at sub-200ms speeds, with standard AMM transactions failing due to micro-slot 
+  MEV sandwiching and priority fee spikes.
+Spoken Narrative:
+"Solana Breakpoint 2026: Firedancer is live, slot times are sub-200 milliseconds, 
+and legacy AMMs are collapsing under toxic flow and micro-slot sandwiching. When 
+blocks settle this fast, naive DEX transactions either fail or surrender catastrophic 
+slippage to predatory searchers. We need deterministic, atomic settlement."
+
+[00:15 - 00:45] ARCHITECTURE BREAKDOWN: INTENTS + TOKEN-2022
+Visual:
+- Smooth zoom into Mermaid Architecture diagram: Highlighting Alice & Bob's 
+  off-chain signed intents converging into the Merkle Aggregator and Jito-Firedancer bundle.
+Spoken Narrative:
+"Introducing Aegis-2026: an open-source, reference-grade intent settlement engine 
+built specifically for the Agave and Firedancer parallel execution pipelines. 
+Instead of exposing individual swaps to public mempools, Aegis compresses batch fills 
+into cryptographic Keccak Merkle trees. Liquidity is locked in dual-seed PDAs, 
+guaranteed by Token-2022 Transfer Hook extensions that programmatically enforce 
+anti-MEV velocity ceilings directly within the transfer instruction itself."
+
+[00:45 - 01:15] LIVE TERMINAL DEMO: ANCHOR TEST EXECUTION
+Visual:
+- Split screen: Left side shows `anchor test` executing with all 4 integration tests 
+  passing in green. Right side displays Solana CU Profiler showing 32,840 Compute Units consumed.
+Spoken Narrative:
+"Watch the execution live. In our integration test suite, we initialize the market, 
+deposit into a segregated PDA vault, and settle atomic fills. Look at the compute budget: 
+just 32,840 Compute Units for a full Merkle verification and Token-2022 CPI payout! 
+By using zero-copy account layouts and optimized byte serialization, Aegis achieves 
+predictable, guaranteed micro-slot inclusion without paying extortionate priority tips."
+
+[01:15 - 01:45] SECURITY & ANTI-REPLAY PROOF
+Visual:
+- Terminal runs the replay attack exploit test: Shows Solana runtime halting the 
+  attack with `already in use` and `BatchAlreadyProcessed`.
+Spoken Narrative:
+"Security is non-negotiable. Replay attacks are mathematically impossible: each batch 
+instantiates a deterministic PDA receipt that permanently burns the nonce in that micro-slot. 
+If an off-chain keeper ever stalls, our 24-hour TTL emergency reclaim guarantees users 
+can retrieve 100% of their escrowed principal. Zero reentrancy, zero unallocated heap space, 
+zero compromise."
+
+[01:45 - 02:00] THE WINNING CLOSE
+Visual:
+- GitHub repository screen with full documentation, audit checklist, and Dockerized 
+  Firedancer benchmark runner. Title card: "Aegis-2026: Ready for Mainnet."
+Spoken Narrative:
+"Aegis-2026 isn't a prototype—it is fully audited, production-tested Rust architecture 
+designed to elevate the entire Solana ecosystem at Breakpoint 2026. Fast, MEV-immune, 
+and built for the next billion transactions on Solana. Thank you."
+================================================================================

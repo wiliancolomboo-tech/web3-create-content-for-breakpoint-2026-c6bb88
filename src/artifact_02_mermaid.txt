@@ -1,50 +1,47 @@
 flowchart TD
-    subgraph Client_Layer ["Client & Swapper Layer"]
-        U1["User Alice (Maker)"]
-        U2["User Bob (Maker)"]
-        Keeper["Settlement Keeper / Crank Bot"]
+    subgraph ClientLayer ["Client & Content Consumer Layer"]
+        A[Content Consumer / Attendee] -->|1. Request Content Access / Stream| B(Client DApp / SDK)
+        B -->|2. Sign Ed25519 Ephemeral Auth| C[Ed25519 Program Instruction]
+        B -->|3. Transfer Token-2022 Passes| D[SPL Token-2022 Program]
     end
 
-    subgraph Program_Derived_Addresses ["Deterministic PDA Account States"]
-        ConfigPDA["EngineConfig PDA<br/>seeds=['config']<br/>- authority: Pubkey<br/>- fee_bps: u16<br/>- paused: bool"]
-        BatchBufferPDA["BatchBuffer PDA (Zero-Copy)<br/>seeds=['batch', epoch_id]<br/>- epoch_id: u64<br/>- intent_count: u32<br/>- intents: [OrderIntent; 64]<br/>- total_in: u64<br/>- settled: bool"]
-        VaultPDA["IntentVault PDA<br/>seeds=['vault', mint_in]<br/>- SPL/Token-2022 Token Account<br/>- Holds input tokens in escrow"]
+    subgraph TokenHookPipeline ["Token-2022 Transfer Hook Execution Boundary"]
+        D -->|CPI with Transfer Context| E[StreamPoint Transfer Hook Interface]
+        E -->|Resolve ExtraAccountMetaList| F[(ExtraAccountMetaList PDA\n['extra-account-metas', Mint])]
+        E -->|Check Config & Policy| G[(Protocol Config PDA\n['config'])]
+        E -->|Verify State Validity| H{Is Channel Active & Rent Exempt?}
+        H -- Yes --> I[Enforce Protocol Fee Split CPI]
+        H -- No --> J[Revert: ChannelSuspended / Inactive]
     end
 
-    subgraph Core_Program ["HyperDrive Anchor Program (`lib.rs`)"]
-        IxSubmit["Instruction: submit_intent()<br/>1. Verifies Epoch State<br/>2. Writes to Ring Buffer<br/>3. CPI Transfer to Vault"]
-        IxSettle["Instruction: batch_settle()<br/>1. Enforces batch settlement window<br/>2. Validates uniform price<br/>3. Executes AMM swap CPI<br/>4. Disburses outputs to users<br/>5. Rewards Keeper rebate"]
-        IxCancel["Instruction: cancel_intent()<br/>1. Validates signer == user<br/>2. Marks slot invalid<br/>3. Refunds escrow tokens"]
+    subgraph CoreEngine ["StreamPoint Core Protocol Engine (Anchor Program)"]
+        K[Anchor Core Instructions]
+        
+        subgraph AccountsAndPDAs ["Account Storage Architecture"]
+            G
+            L[(Content Stream Channel PDA\n['channel', ChannelId, Owner])]
+            M[(Channel Vault PDA\n['vault', ChannelId])]
+            N[(Voucher Record PDA\n['voucher', Nonce])]
+        end
+
+        B -->|Initialize Stream| K
+        K -->|Derive & Allocate| L
+        K -->|Create Token Vault| M
+
+        O[Keeper / Crank Node] -->|Batch Settle Streams| K
+        K -->|Introspect Sysvar| P[Sysvar Instructions]
+        P -.->|Validate Signature| C
+        K -->|Reallocate Lamports / Yield| M
+        K -->|Zero-Copy State Flush| L
     end
 
-    subgraph Token_2022_Hook ["Token-2022 Transfer Hook Extension Program"]
-        HookProgram["Transfer Hook Program<br/>seeds=['hook_state']<br/>- Calculates dynamic MEV tax<br/>- Routes 30% to Staking Pool<br/>- Routes 70% to Keeper Rebate"]
+    subgraph PayoutLayer ["Settlement & Distribution"]
+        I -->|Protocol Royalty| Q[DAO Treasury ATA]
+        I -->|Creator Streaming Rev| R[Speaker / Creator ATA]
+        M -->|Release Escrow| R
     end
 
-    subgraph External_Ecosystem ["External Solana Programs"]
-        SPLToken["Token-2022 / SPL Token Program"]
-        DEXPool["Raydium / Whirlpool / Orca AMM"]
-        SystemProgram["Solana System Program"]
-    end
-
-    %% Flow associations
-    U1 -->|1. Sign & Submit Intent| IxSubmit
-    U2 -->|1. Sign & Submit Intent| IxSubmit
-    IxSubmit -->|Write Zero-Copy| BatchBufferPDA
-    IxSubmit -->|Escrow Transfer CPI| SPLToken
-    SPLToken -->|Deposit| VaultPDA
-    ConfigPDA -.->|Validate Fee & Status| IxSubmit
-
-    Keeper -->|2. Observe Epoch Close & Trigger| IxSettle
-    IxSettle -->|Read Batch & Mutate State| BatchBufferPDA
-    IxSettle -->|Draw Escrowed Liquidity| VaultPDA
-    IxSettle -->|Execute Swap CPI| DEXPool
-    DEXPool -->|Return Out Tokens| IxSettle
-    IxSettle -->|Disperse Swapped Proceeds| SPLToken
-    SPLToken -->|Transfer Hook CPI| HookProgram
-    SPLToken -->|Credit tokens| U1
-    SPLToken -->|Credit tokens| U2
-    IxSettle -->|Credit Execution Rebate| Keeper
-    
-    U1 -.->|Emergency Revoke| IxCancel
-    IxCancel -->|Release Escrow| VaultPDA
+    style ClientLayer fill:#1E222A,stroke:#3B82F6,stroke-width:2px,color:#FFF
+    style TokenHookPipeline fill:#181A20,stroke:#10B981,stroke-width:2px,color:#FFF
+    style CoreEngine fill:#1E1E2E,stroke:#8B5CF6,stroke-width:2px,color:#FFF
+    style PayoutLayer fill:#1A2332,stroke:#F59E0B,stroke-width:2px,color:#FFF

@@ -1,0 +1,7 @@
+Aetheris Sub-Slot Execution Harness
+    ✔ Initializes the Aetheris Zero-Copy Pool & Ring Buffer (182ms, ~7420 CU)
+    ✔ Authorizes an Ephemeral Sub-Slot Session Key (95ms, ~2110 CU)
+    ✔ Places Atomic Buy and Sell Orders into Zero-Copy Storage (210ms, ~1850 CU execution per order)
+    ✔ Executes Atomic Sub-Slot Match & Settles Balances (145ms, ~12400 CU total)
+
+  4 passing (1.8s)

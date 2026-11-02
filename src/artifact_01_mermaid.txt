@@ -1,0 +1,69 @@
+flowchart TD
+    %% Subgraphs
+    subgraph ClientLayer ["Client & Off-Chain Keepers (Breakpoint 2026)"]
+        UserAlice["Alice (Maker Intent)"]
+        UserBob["Bob (Taker Intent)"]
+        Keeper["Jito-Firedancer Bundle Keeper / Crank"]
+        MerkleEngine["Off-Chain ZK/Merkle Tree Aggregator"]
+    end
+
+    subgraph ProgramBoundary ["Aegis-2026 Settlement Program (BP2026 Core)"]
+        direction TB
+        
+        subgraph SecurityGuards ["Security & Access Guards"]
+            SignerCheck["Signer & Timestamp Verification"]
+            SeedDerivation["PDA Derivation Guard: ['settlement_vault', authority, nonce]"]
+            RentImmunity["Rent Exemption & Zero-Alloc Deserializer"]
+            HookGuard["Transfer-Hook Invariant Enforcer"]
+        end
+
+        subgraph InstructionHandlers ["Instruction Dispatch Engine"]
+            IX_Init["initialize_market()"]
+            IX_Deposit["escrow_deposit()"]
+            IX_Settle["settle_batch_intents(merkle_proof, fills)"]
+            IX_Reclaim["reclaim_expired()"]
+        end
+
+        subgraph AccountState ["Program Derived Accounts (PDAs)"]
+            GlobalConfig["GlobalSettlementConfig PDA<br/>['config']"]
+            VaultState["EscrowVault PDA<br/>['settlement_vault', authority, nonce]"]
+            TokenVault["SPL Token-2022 Vault Account<br/>Owner: EscrowVault PDA"]
+            ReceiptAcc["FillReceipt PDA (Zero-Copy Bitmask)<br/>['receipt', batch_id]"]
+        end
+    end
+
+    subgraph Token2022Program ["Solana Token-2022 Program & Extensions"]
+        TokenHook["Transfer Hook Program<br/>(Anti-MEV Velocity Guard)"]
+        TokenMint["Token-2022 Mint with Hook Ext."]
+    end
+
+    subgraph CoreEngine ["Consensus & Settlement (Firedancer / Agave)"]
+        SolanaRuntime["Sealevel Engine (Parallel Execution)"]
+        BankFiredancer["Firedancer Micro-Slot Leader Pipeline"]
+    end
+
+    %% Flow Relationships
+    UserAlice -->|"1. Submit Signed Intent"| MerkleEngine
+    UserBob -->|"1. Submit Signed Intent"| MerkleEngine
+    MerkleEngine -->|"2. Generate Merkle Root & Batch Proof"| Keeper
+    Keeper -->|"3. Transmit Jito MEV Bundle with Priority CU"| BankFiredancer
+
+    BankFiredancer -->|"4. Execute Transaction"| SolanaRuntime
+    SolanaRuntime -->|"5. Route CPI"| ProgramBoundary
+
+    ProgramBoundary --> SignerCheck
+    SignerCheck --> SeedDerivation
+    SeedDerivation --> RentImmunity
+
+    RentImmunity --> IX_Settle
+    IX_Settle -->|"Verify Intent Validity"| GlobalConfig
+    IX_Settle -->|"Verify Non-Replay Bitmask"| ReceiptAcc
+    IX_Settle -->|"Mutate Balances"| VaultState
+
+    IX_Settle -->|"6. CPI: Transfer Checked"| Token2022Program
+    Token2022Program -->|"Execute Pre-Transfer CPI"| TokenHook
+    TokenHook -->|"Enforce Max Velocity / Slippage Invariant"| HookGuard
+    HookGuard -->|"Allow State Finalization"| TokenVault
+
+    TokenVault -->|"7. Disburse Tokens to Maker/Taker"| UserAlice
+    TokenVault -->|"7. Disburse Tokens to Maker/Taker"| UserBob

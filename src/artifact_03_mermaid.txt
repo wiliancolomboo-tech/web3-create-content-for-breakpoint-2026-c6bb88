@@ -1,0 +1,58 @@
+flowchart TD
+    subgraph ClientLayer ["Client & Ingress Layer"]
+        Maker["Trader / Market Maker"]
+        Taker["Taker / Searcher / Solver"]
+        RPC["Helius / Triton Sub-Slot RPC Node"]
+    end
+
+    subgraph ProgramBoundaries ["ChronoStrike Anchor Program (SVM)"]
+        Init["Instruction: initialize_market"]
+        PostIntent["Instruction: post_intent"]
+        ExecuteFill["Instruction: execute_batch_fill"]
+        ClaimRefund["Instruction: cancel_expired_intent"]
+
+        subgraph PDAs ["Program Derived Addresses (PDAs)"]
+            MarketConfig["Market State PDA<br/>seeds=['market', market_id]<br/>Zero-Copy Account"]
+            MakerEscrow["Maker Escrow Vault PDA<br/>seeds=['vault', market_id, maker]<br/>SPL Token-2022 Account"]
+            IntentRegistry["Intent Registry PDA<br/>seeds=['intent', market_id, intent_nonce]<br/>Account State Ring Buffer"]
+        end
+
+        subgraph Guards ["Security & Validation Checks"]
+            SignerCheck{"Signer == Authority?"}
+            ClockCheck{"Slot <= ExpirationSlot?"}
+            ReentrancyGuard{"State Flag == ACTIVE?"}
+            CUOptimization["SetComputeUnitLimit(45_000)<br/>SetComputeUnitPrice(1_000)"]
+        end
+    end
+
+    subgraph ExternalPrograms ["External Program Invocations (CPI)"]
+        Token2022["SPL Token-2022 Program<br/>(TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb)"]
+        SystemProgram["Solana System Program<br/>(11111111111111111111111111111111)"]
+    end
+
+    subgraph Keepers ["Decentralized Keeper Network"]
+        SolverDaemon["Solver Bot / Jito Bundler Engine"]
+    end
+
+    %% Flow connections
+    Maker -->|"1. Deposit & Commit Intent"| PostIntent
+    PostIntent --> SignerCheck
+    SignerCheck -->|"Pass"| MakerEscrow
+    PostIntent -->|"CPI TransferChecked"| Token2022
+    PostIntent -->|"Register Order State"| IntentRegistry
+
+    SolverDaemon -->|"2. Detect Matching Liquidity"| RPC
+    RPC -->|"3. Assemble Atomic Batch"| ExecuteFill
+
+    ExecuteFill --> CUOptimization
+    ExecuteFill --> ClockCheck
+    ClockCheck -->|"Valid"| ReentrancyGuard
+    ReentrancyGuard -->|"Unlocked"| MarketConfig
+    
+    ExecuteFill -->|"CPI: Transfer Maker Output to Taker"| Token2022
+    ExecuteFill -->|"CPI: Transfer Taker Input to Maker"| Token2022
+    ExecuteFill -->|"Update Nonce & State"| IntentRegistry
+
+    Taker -.->|"Liquidates/Solves"| ExecuteFill
+    Maker -->|"Emergency Claim"| ClaimRefund
+    ClaimRefund -->|"Refund Remaining Escrow"| Token2022

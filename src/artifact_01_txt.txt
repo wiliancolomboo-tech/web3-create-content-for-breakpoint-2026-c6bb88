@@ -1,14 +1,9 @@
-HyperDrive Core Engine
-                           
-   +----------------+     +-------------------+     +--------------------+
-   |  User Intent   | --> | Zero-Copy Epoch   | --> | Keeper-Triggered   |
-   | (Off-chain sig |     | Batch Buffer PDA  |     | Uniform Clearing   |
-   |  + On-chain)   |     | (Ring Buffer)     |     | CPI Settlement     |
-   +----------------+     +-------------------+     +--------------------+
-                                                      |
-                                                      v
-                                            +--------------------+
-                                            | Token-2022 Hook    |
-                                            | (Dynamic MEV Tax   |
-                                            |  & Rebate Split)   |
-                                            +--------------------+
+┌───────────────────────────────────────────────────────────────┐
+   │                     Key System Metrics                        │
+   ├──────────────────────────────┬────────────────────────────────┤
+   │ Rent Overhead                │ 0 Lamports for stateless claims │
+   │ Transfer Hook Execution Cost │ ~11,420 Compute Units          │
+   │ Multi-Channel Crank Settle   │ ~4,800 CUs per user channel    │
+   │ Anti-Reentrancy Overhead     │ 0 CUs (Bitmask state-packed)   │
+   │ Token Extension Support      │ Native SPL Token-2022 Hooks    │
+   └──────────────────────────────┴────────────────────────────────┘

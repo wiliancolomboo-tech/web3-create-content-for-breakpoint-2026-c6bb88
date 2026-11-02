@@ -1,0 +1,35 @@
+================================================================================
+TIME    | VISUAL FOCUS                                | SPOKEN AUDIO NARRATION
+================================================================================
+00:00 - | Fullscreen Title Slide: StreamPoint-2026    | "Solana Breakpoint 2026 is here,
+00:15   | Terminal split with Firedancer node status  | and the era of sub-second streaming
+        | displaying sub-second block times.          | micro-payments has arrived. But how
+        |                                             | do we enforce creator royalties and
+        |                                             | real-time ticketing at 100k TPS?"
+
+00:15 - | Architecture Diagram zoom:                  | "Introducing StreamPoint-2026: a zero-
+00:35   | Token-2022 Transfer Hook Pipeline and       | copy protocol built on native Token-2022
+        | PDA Vault hierarchy.                        | Transfer Hooks and state-minimized 
+        |                                             | instruction sysvar introspection."
+
+00:35 - | CLI Terminal: Running `anchor test`.        | "Notice our transfer hook: rather than
+00:60   | Highlight test `settle_stream` and          | keeping bulky, expensive user state, it
+        | display CU profile output (< 29k CUs).     | validates access and enforces protocol
+        |                                             | revenue sharing directly within the runtime
+        |                                             | transfer pipeline for under 12k CUs."
+
+00:60 - | Split Screen: Consumer Browser Client       | "Watch this: As an attendee unlocks a 
+01:25   | watching a 4K Keynote stream while lamports | keynote stream, tokens are streamed
+        | increment live in Speaker wallet.          | every second. Our autonomous keeper
+        |                                             | cranks settle payouts in atomic batches
+        |                                             | without reentrancy or front-running risk."
+
+01:25 - | Security Matrix Slide & CU Benchmark        | "With mathematically checked math, strict
+01:45   | comparison table vs Ethereum/Sui.          | PDA canonical enforcement, and native
+        |                                             | compatibility with confidential transfers,
+        |                                             | StreamPoint sets the standard for 2026."
+
+01:45 - | Outro slide: GitHub link, docs, and         | "StreamPoint-2026: Composable, ultra-fast,
+02:00   | contact info. Ready for Breakpoint Mainnet. | and production-ready. We're claiming 
+        |                                             | 1st place for technical excellence."
+================================================================================

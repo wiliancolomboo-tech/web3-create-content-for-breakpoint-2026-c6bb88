@@ -1,0 +1,70 @@
+{
+  "deliverable_id": "superteam_1f11a5c6bb88",
+  "opportunity_id": "st-b876d371-ebec-4c8f-8ff8-f19bdb8cff90",
+  "platform": "SuperteamEarn",
+  "title": "Create Content for Breakpoint 2026",
+  "url": "https://earn.superteam.fun/listings/bounty/create-content-for-breakpoint-2026",
+  "budget": "8,000 USDG",
+  "prize_amount": 8000.0,
+  "ecosystem": "Solana",
+  "github_url": "https://github.com/wiliancolomboo-tech/web3-create-content-for-breakpoint-2026-c6bb88",
+  "status": "ready_for_submission",
+  "validation_reports": [
+    {
+      "file": "artifact_01_mermaid.txt",
+      "language": "mermaid",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_02_rust.rs",
+      "language": "rust",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_03_typescript.ts",
+      "language": "typescript",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_04_markdown.txt",
+      "language": "markdown",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_05_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_06_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_07_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_08_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_09_text.txt",
+      "language": "text",
+      "valid": true,
+      "error": null
+    }
+  ],
+  "git_initialized": true,
+  "created_at": "2026-09-07 21:36:03"
+}

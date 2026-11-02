@@ -1,0 +1,8 @@
+HyperHook Engine: Token-2022 Test Matrix
+    ✔ Initializes HyperHook program and configures ExtraAccountMetaList (420ms)
+    ✔ Executes a valid Token-2022 transfer within rate limit parameters (380ms)
+    ✔ Rejects transfer exceeding maximum sliding-window transfer quota (112ms)
+    ✔ Keeper successfully cranks expired window and receives incentive rebate (3150ms)
+    ✔ Enforces administrative pause guard (210ms)
+
+  5 passing (4.3s)

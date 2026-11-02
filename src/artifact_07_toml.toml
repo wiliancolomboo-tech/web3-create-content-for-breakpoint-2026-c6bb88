@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-hyperdrive = "HypRDrive1111111111111111111111111111111111"
+hyper_hook = "Hook111111111111111111111111111111111111111"
 
 [registry]
 url = "https://api.apr.dev"
